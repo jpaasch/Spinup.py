@@ -9,9 +9,9 @@ This is essentially a wrapper for virtualbox, vagrant, and puppet, but it automa
 Installation
 ------------
 
-To install Spinup, simply download `spinup.py` and store it somewhere -- e.g. in `~/scripts/`. To use it, you can then type:
+To install Spinup, simply download `spinup.py` and store it somewhere -- e.g. in `~/scripts/`. To use it, you can then type in a terminal:
 
-    python ~/scripts/spinup.py
+    > python ~/scripts/spinup.py
 
 If you like, you can create a shortcut in your `.bashrc` file, or whatever suits you.
 
@@ -22,8 +22,8 @@ To use Spinup, you simply need to navigate into the project folder you want a de
 
 For instance, suppose I want to build a website in `~/Documents/my-new-website`. I would navigate into that folder, then run `spinup.py`, like this:
 
-    cd ~/Documents/my-new-website
-    python ~/scripts/spinup.py 
+    > cd ~/Documents/my-new-website
+    > python ~/scripts/spinup.py 
 
 That will start up the interactive Spinup program, which will begin with a screen that looks something like this: 
 
@@ -48,11 +48,11 @@ That will start up the interactive Spinup program, which will begin with a scree
 
 To spin up a development VM, type: 
 
-    spinup 
+    >> spinup 
 
 To boot down your development VM, type: 
 
-    spindown
+    >> spindown
 
 Note: the first time you spin up a VM, it will likely take a long time. This is because it has to download a basic linux box (so be sure you have a good internet connection). After the first time, the VM will boot up much quicker (typically just a couple of minutes). 
 
