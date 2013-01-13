@@ -748,6 +748,33 @@ class Spinner:
         self.shut_down_box()
 
 
+    def ssh(self):
+        """
+        SSH into the development box.
+        """
+
+        # Change into the vagrant folder
+        self.cd_into_vagrant() 
+
+        # Try to ssh into the vagrant box
+        try: 
+            result = subprocess.check_call(['vagrant', 'ssh'])
+        except subprocess.CalledProcessError as exception:
+            message = """
+                I could not ssh into the development box. 
+                You could try navigating into the 
+                `""" + self.data.vagrant_folder + """`
+                folder and running the `vagrant ssh` command.
+            """
+            Utilities.show_error(message)
+        # else:
+            # List the commands again
+            # print self.data.cli.show_commands()
+
+        # Get out of the vagrant folder
+        self.cd_out_of_vagrant()
+
+
 
 #########################################################
 #########################################################
@@ -762,6 +789,7 @@ class Cli(cmd.Cmd):
     commands = {
         'spinup': '-- `spinup` to spin up your dev box.',
         'spindown': '-- `spindown` to shut down your dev box.',
+        'ssh': '-- `ssh` to ssh into your dev box.',
         'help-command': '-- `help <command>` for help on a specific command',
         'help': '-- `help` for a list of all commands',
         'exit': '-- `exit` to quit'
@@ -877,6 +905,21 @@ class Cli(cmd.Cmd):
         print self.show_commands(omit=['spindown'])
 
 
+    def do_ssh(self, text):
+        """
+        The `ssh` command SSHs into the development VM.
+        """
+
+        # SSH into the dev box
+        self.data.spinner.ssh()
+
+        # List the commands again
+        print '\n'
+        print '*************************************'
+        print '\n'
+        print self.show_commands(omit=['spinup'])
+
+
 
 #########################################################
 #########################################################
@@ -934,6 +977,7 @@ Data.spinner = spinner
 
 # Run the command line interpreter.
 cli = Cli()
+Data.cli = cli
 cli.register_data(Data)
 cli.cmdloop()
 
