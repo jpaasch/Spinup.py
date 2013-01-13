@@ -46,3 +46,13 @@ When you run Spinup, it will create a hidden folder called `.devbox` in the curr
 
 Spinup will then create a `Vagrantfile` inside the .devbox folder, as well as a `manifests` folder. If you want to include a puppet manifest, add it as `default.pp` inside the `manifests` folder.
 
+Working on code
+---------------
+
+Spinup will mount the current working directory on the VM at `/var/www/root/`. You can configure a webserver on the VM to use that path as its document root. You can then access the webserver on your own computer at 
+
+    http://localhost:6666
+
+or whatever address/port Spinup indicates after it spins up a VM for you. (If 6666 is already taken on your computer, Spinup will try a different port). 
+
+This means you can edit the code in the current working directory just as you normally would, but it will also be available to the VM to use.
