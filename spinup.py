@@ -326,6 +326,65 @@ class Installer:
 
 #########################################################
 #########################################################
+# A class that sets up puppet provisioning
+
+class Provisioner:
+    """
+    The `Provisioner` class creates puppet manifest
+    files for provisioning dev boxes.
+    """
+
+    nginx = '# Make sure Nginx is installed.\n'
+    nginx += "package { 'nginx':\n"
+    nginx += '    ensure => present,\n'
+    nginx += '}\n'
+    nginx += '\n'
+    nginx += '# Make sure nginx is running.\n'
+    nginx += "service { 'nginx':\n"
+    nginx += '    ensure => running,\n'
+    nginx += "    require => Package['nginx'],\n"
+    nginx += '}\n'
+
+    def __init__(self, data):
+        """ 
+        Initializes the provisioner by storing some data.
+        """
+        self.data = data
+
+
+    def manifest(self):
+        """
+        Creates a basic puppet manifest file.
+        """
+
+        # If no puppet manifest exists, try and create one.
+        if not Utilities.file_exists(self.data.manifests_file):
+
+            # Write the file
+            result = Utilities.write_file(self.data.manifests_file, self.nginx)
+
+            # Handle errors
+            if result[0] is False:
+                if result[1] is 'permissions':
+                    message = """
+                        I could not create a puppet manifest file
+                        in `""" + self.data.manifest_folder + """`, 
+                        because I don't have permission. Change the 
+                        permissions to something like 740, then 
+                        run me again.
+                    """
+                else:
+                    message = """
+                        I'm sorry, but I could not create a puppet 
+                        manifest file. The error message I received
+                        was this: """ + str(result[1]) + """.
+                    """
+                Utilities.show_error(message)
+
+
+
+#########################################################
+#########################################################
 # A class that sets up a vagrant/puppet environment
 
 class Setup:
@@ -396,6 +455,9 @@ class Setup:
                """
             Utilities.show_error(message)
 
+        # Initialize a puppet manifest.
+        self.data.provisioner.manifest()
+
         # Initialize vagrant.
         self.initialize_vagrant()
 
@@ -443,13 +505,7 @@ class Setup:
                     contents += '  config.vm.forward_port 80, '
                     contents += port + '\n'
 
-                # If a puppet manifest exists, use it
-                elif 'config.vm.provision :puppet' in line:
-                    if manifests:
-                        contents += '  config.vm.provision :puppet, '
-                        contents += ':options => \'--verbose\''
-                    else:
-                        contents += line
+                # Otherwise, leave the line as it is.
                 else:
                     contents += line
 
@@ -481,7 +537,7 @@ class Setup:
             contents +=    ':create => true' + "\n" 
             contents += "\n"
             contents += "  # Let Puppet do the provisioning.\n"
-            contents += '  # config.vm.provision :puppet, '
+            contents += '  config.vm.provision :puppet, '
             contents +=    ':options => \'--verbose\'' + "\n"
             contents += "\n"
             contents += 'end' + "\n"
@@ -867,6 +923,10 @@ Data.installer = installer
 # Instantiate the setup tool.
 setup = Setup(Data)
 Data.setup = setup
+
+# Instantiate the provisioner.
+provisioner = Provisioner(Data)
+Data.provisioner = provisioner
 
 # Instantiate the spinner
 spinner = Spinner(Data)
