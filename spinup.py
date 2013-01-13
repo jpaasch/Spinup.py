@@ -415,7 +415,7 @@ class Setup:
         port = str(self.data.port)
         code_folder_name = str(self.data.code_folder_name)
         code_folder_path_on_box = str(self.data.code_folder_path_on_box)
-        code_folder_path_on_host = str(os.path.dirname(os.getcwd()))
+        code_folder_path_on_host = str(os.path.realpath(os.getcwd()))
 
         # Check if a puppet manifest exists
         manifests = Utilities.file_exists(self.data.manifests_file)
