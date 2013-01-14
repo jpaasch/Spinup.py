@@ -99,9 +99,9 @@ You can boot up your dev box anytime by navigating into the project folder and r
 The .devbox folder 
 ------------------
 
-When you spin up a develpmont box for the first time in a folder, Spinup will create a hidden folder called `.devbox` in the current working directory. All special files are contained there. This is much like how git stores its special files in a hidden folder called `.git`. 
+When you spin up a develpmont box for the first time from within a folder, Spinup will create a hidden folder called `.devbox` in that directory. All special files are contained there. This is much like how git stores its special files in a hidden folder called `.git`. 
 
 Spinup will then create a `Vagrantfile` inside the `.devbox` folder, and the `Vagrantfile` is the configuration file for vagrant. You can edit it as you see fit; Spinup will only modify forwarded ports if there are port conflicts that it needs to resolve.
 
-Spinup will also create in `.devbox` a `manifests` folder and a basic `default.pp` file. The `default.pp` manifest does little more than make sure nginx is up and running on your development VM, and that it points to your current working directory. If you want to modify the manifest file, by all means do. Spinup will not overwrite your changes. 
+Spinup will also create in `.devbox` a `manifests` folder and a basic `default.pp` file. The `default.pp` manifest does little more than make sure nginx is up and running on your development box, and that it points to your current working directory. If you want to modify the manifest file, by all means do. Spinup will not overwrite your changes. 
 
