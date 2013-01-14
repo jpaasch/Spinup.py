@@ -8,8 +8,9 @@ This script installs virtualbox, vagrant, and puppet
 on your computer, then it sets up a virtual box
  that you can use as your development server.
 
-It currently only supports Linux. Perhaps someday  
-it will be expanded to handle OS X and Windows too.
+It currently only supports OSes in the Ubuntu Linux 
+family. Perhaps someday it will be expanded to handle 
+OSes in the Redhat family, OS X, and Windows too.
 
 """
 
@@ -25,9 +26,9 @@ class Utilities:
     @staticmethod
     def show_error(message):
         """
-        For pretty error messages. This function
+        For prettier error messages. This function
         splits up a message into lines with 6 words
-        each, then prints it out in a nice format.
+        each, then prints it out in a nicer format.
         """
         words = message.split()
         line_length = 6
@@ -80,8 +81,10 @@ class Utilities:
     def create_folder(folder):
         """
         Attempts to create a folder in the current directory.
-        Returns `True` if the folder got created or already
-        exists. Returns `False` if it failed to create it.
+        Returns a tuple:
+        -- (True, exception) if the folder exists already.
+        -- (False, 'permissions') if access was denied.
+        -- (False, exception) for all other errors.
         """
         try:
             os.mkdir(folder, 0740)
@@ -100,6 +103,10 @@ class Utilities:
     def write_file(path, contents):
         """
         Attempts to write a file to disk.
+        Returns a tuple:
+        -- (True, path) if successful.
+        -- (False, 'permissions') if access was denied.
+        -- (False, exception) for all other errors.
         """
         try:
             file = open(path, 'w+')
@@ -112,10 +119,6 @@ class Utilities:
             file.write(contents)
             file.close()
             return (True, path)
-
-
-
-
 
 
 
@@ -135,7 +138,7 @@ fileinput = Utilities.import_or_catch('fileinput')
 
 #########################################################
 #########################################################
-# A dictionary for data:
+# A dictionary for data
 
 class Data:
     """
@@ -159,10 +162,11 @@ class Data:
 
 class Installer:
     """
-    This class installs required software:
-    - Virtual Box
-    - Vagrant
-    - Puppet
+    This class tries to install the following 
+    required software:
+    -- Virtual Box
+    -- Vagrant
+    -- Puppet
     """
 
     # The required software that needs to be installed.
@@ -182,6 +186,8 @@ class Installer:
     def program_exists_on_nix(self, program):
         """
         Checks if a program exists on a *nix system.
+        Returns the path to the program if it exists,
+        False otherwise.
         """
         try:
             return subprocess.check_output(['which', program])
@@ -191,7 +197,7 @@ class Installer:
 
     def find_linux_package_manager(self):
         """
-        Tries to identify the linux package manager (apt-get, yum, etc.).
+        Tries to identify the Linux package manager (apt-get, yum, etc.).
         """
 
         # See if any package manager/installers exist on the system.
@@ -309,6 +315,7 @@ class Installer:
             for program in self.required_software:
                 if not self.program_exists_on_nix(program):
                     ready = False
+
             if not ready:
 
                 # Give a message about what's up
@@ -340,18 +347,20 @@ class Provisioner:
         """
         self.data = data
 
+
     def basic_nginx(self):
         """
-        Returns a basic nginx manifest.
+        Returns a basic nginx manifest that points to 
+        the current cwd as the web root.
         """
 
-        # Check if there is an index.html file in the cwd already
-        # If not, we'll create one.
+        # Check if there is an index.html file in the cwd already.
+        # If not, we'll create one
         cwd = str(os.path.realpath(os.getcwd()))
         filename = cwd + os.sep + 'index.html'
         index_file = Utilities.file_exists(filename)
 
-        # Construct the nginx vhosts file
+        # Construct a basic nginx virtual hosts file
         nginx = '# Make sure Nginx is installed.\n'
         nginx += "package { 'nginx':\n"
         nginx += '    ensure => present,\n'
@@ -398,13 +407,13 @@ class Provisioner:
 
     def manifest(self):
         """
-        Creates a basic puppet manifest file.
+        Creates a puppet manifest file.
         """
 
         # If no puppet manifest exists, try and create one.
         if not Utilities.file_exists(self.data.manifests_file):
 
-            # Write the file
+            # Try to write the file
             contents = self.basic_nginx()
             result = Utilities.write_file(self.data.manifests_file, contents)
 
@@ -438,9 +447,9 @@ class Setup:
     the vagrant/puppet environment. This involves:
     (a) creating a `.devbox` folder in the cwd,
     (b) creating a `Vagrantfile` in `.devbox`, and
-    (c) creating a `manifests` folder in `.devbox`.
+    (c) creating a `manifests` folder in `.devbox`,
+        using the Provisioner class.
     """
-
 
     def __init__(self, data):
         """
@@ -454,7 +463,8 @@ class Setup:
         Sets up a development box.
         """
 
-        # Create a folder to house the vagrant VM
+        # Try to create a folder to house the vagrant VM
+        # (if the folder does not already exist)
         devbox_result = Utilities.create_folder(self.data.vagrant_folder)
 
         # Handle errors.
@@ -478,7 +488,8 @@ class Setup:
                """
             Utilities.show_error(message) 
 
-        # Create the puppet manifest folder
+        # Try to create the puppet manifest folder 
+        # (if it does not already exist)
         manifests_result = Utilities.create_folder(self.data.manifests_folder)
 
         # Handle errors
@@ -511,9 +522,8 @@ class Setup:
         """
         Initializes vagrant by modifying or creating a 
         custom `Vagrantfile`. If the file exists already,
-        this method can override the port specified in it. 
-        If a puppet manifest exists, this method will make
-        sure it is declared in the `Vagrantfile`. 
+        this method can still overwrite the specified port,
+        the box name, and the box url.
         """
 
         # Establish some useful values.
@@ -527,11 +537,11 @@ class Setup:
         # Check if a puppet manifest exists
         manifests = Utilities.file_exists(self.data.manifests_file)
 
-        # We'll build or store the vagrant file in this string.
+        # We'll build the vagrant file in this string.
         contents = ''
 
-        # If the file exists, read it line by line 
-        # and replace the bits that matter.
+        # If the Vagrantfile exists, read it line by line 
+        # and replace any bits that matter.
         if Utilities.file_exists(self.data.vagrant_file):
             for line in fileinput.input([self.data.vagrant_file]):
 
