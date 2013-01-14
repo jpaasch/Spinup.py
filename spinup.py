@@ -334,22 +334,66 @@ class Provisioner:
     files for provisioning dev boxes.
     """
 
-    nginx = '# Make sure Nginx is installed.\n'
-    nginx += "package { 'nginx':\n"
-    nginx += '    ensure => present,\n'
-    nginx += '}\n'
-    nginx += '\n'
-    nginx += '# Make sure nginx is running.\n'
-    nginx += "service { 'nginx':\n"
-    nginx += '    ensure => running,\n'
-    nginx += "    require => Package['nginx'],\n"
-    nginx += '}\n'
-
     def __init__(self, data):
         """ 
         Initializes the provisioner by storing some data.
         """
         self.data = data
+
+    def basic_nginx(self):
+        """
+        Returns a basic nginx manifest.
+        """
+
+        # Check if there is an index.html file in the cwd already
+        # If not, we'll create one.
+        cwd = str(os.path.realpath(os.getcwd()))
+        filename = cwd + os.sep + 'index.html'
+        index_file = Utilities.file_exists(filename)
+
+        # Construct the nginx vhosts file
+        nginx = '# Make sure Nginx is installed.\n'
+        nginx += "package { 'nginx':\n"
+        nginx += '    ensure => present,\n'
+        nginx += '}\n'
+        nginx += '\n'
+        nginx += '# Rewrite the virtual hosts file\n'
+        nginx += "file { '/etc/nginx/sites-available/default':\n"
+        nginx += "    require => Package['nginx'],\n"
+        nginx += "    content => '\n"
+        nginx += "server {\n"
+        nginx += '    listen      80;\n'
+        nginx += '    server_name localhost;\n'
+        nginx += '\n'
+        nginx += '    index       index.html;\n'
+        nginx += '    root        ' + self.data.code_folder_path_on_box + ';\n'
+        nginx += "}',\n"
+        nginx += '}\n'
+        nginx += '\n'
+        if not index_file:
+            nginx += '# Create an index file\n'
+            nginx += "file { '" + self.data.code_folder_path_on_box 
+            nginx +=          "/index.html':\n"
+            nginx += "    require => File["
+            nginx +=      "'/etc/nginx/sites-available/default'],\n"
+            nginx += "    content => '\n"
+            nginx += '<html><h1>Welcome to your nginx site.</h1></html>\n'
+            nginx += "',\n"
+            nginx += '}\n'
+            nginx += '\n'
+        nginx += '# Make sure nginx is running.\n'
+        nginx += "service { 'nginx':\n"
+        nginx += '    ensure => running,\n'
+        nginx += "    require => File[" 
+        if not index_file:
+            nginx +=  "'" + self.data.code_folder_path_on_box 
+            nginx +=  "/index.html'],\n"
+        else: 
+            nginx +=  "'/etc/nginx/sites-available/default'],\n"
+        nginx += '}\n'
+        nginx += '\n'
+
+        return nginx
 
 
     def manifest(self):
@@ -361,7 +405,8 @@ class Provisioner:
         if not Utilities.file_exists(self.data.manifests_file):
 
             # Write the file
-            result = Utilities.write_file(self.data.manifests_file, self.nginx)
+            contents = self.basic_nginx()
+            result = Utilities.write_file(self.data.manifests_file, contents)
 
             # Handle errors
             if result[0] is False:
