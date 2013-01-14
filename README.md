@@ -6,6 +6,15 @@ Spin up a development VM quickly and easily from the command line.
 
 This is essentially a wrapper for virtualbox, vagrant, and puppet, but it automates all the setup and makes it possible to spin up a VM for a project with one command.
 
+Requirements
+------------
+
+Spinup currently only works on Ubuntu based Linux OSes. However, that is only because Spinup relies on `apt-get` to install VirtualBox, Vagrant, and Puppet (if they're not already installed). 
+
+In theory, Spinup should also work on the RedHat family of OSes, using `yum` instead of `apt-get`, but I haven't tried it. (I wager it still needs some tweaking to work properly.)
+
+I hope to get it working on OS X at some point in the near future, and Windows too (eventually). At the moment, this is still just a prototype, meant mainly for easing my own development cycle.
+
 Installation
 ------------
 
