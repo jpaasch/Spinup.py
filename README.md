@@ -9,11 +9,12 @@ This is essentially a wrapper for virtualbox, vagrant, and puppet, but it automa
 Requirements
 ------------
 
-Spinup currently only works on Ubuntu based Linux OSes. However, that is only because Spinup relies on `apt-get` to install VirtualBox, Vagrant, and Puppet (if they're not already installed). 
-
-In theory, Spinup should also work on the RedHat family of OSes, using `yum` instead of `apt-get`, but I haven't tried it. (I wager it still needs some tweaking to work properly.)
+I have only tried Spinup on my own machine, so I cannot say that it will work on other machines. But it is currently meant to work on Ubuntu based Linux OSes.
 
 I hope to get it working on OS X at some point in the near future, and Windows too (eventually). At the moment, this is still just a prototype, meant mainly for easing my own development cycle.
+
+(The reason Spinup only works on Ubuntu OSes is because it relies on `apt-get` to install VirtualBox, Vagrant, and Puppet, if they're not already installed. In theory, Spinup should also work on the RedHat family of OSes, using `yum` instead of `apt-get`, but I haven't tried it. I wager it still needs some tweaking to work properly on those systems.)
+
 
 Installation
 ------------
@@ -89,7 +90,7 @@ If you then point your browser to `http://localhost:8500` (or whatever url Spinu
 
 You can exit the Spinup program and come back to it as many times as you like, but the VM will stay running in the background, even when Spinup is not running.
 
-If you want to boot/shut down your development box, type: 
+If you want to boot down your development box, type: 
 
     >> spindown
 
