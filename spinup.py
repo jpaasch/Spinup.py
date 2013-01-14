@@ -823,9 +823,6 @@ class Spinner:
                 folder and running the `vagrant ssh` command.
             """
             Utilities.show_error(message)
-        # else:
-            # List the commands again
-            # print self.data.cli.show_commands()
 
         # Get out of the vagrant folder
         self.cd_out_of_vagrant()
