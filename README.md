@@ -90,16 +90,16 @@ If you then point your browser to `http://localhost:8500` (or whatever url Spinu
 
 You can exit the Spinup program and come back to it as many times as you like, but the VM will stay running in the background, even when Spinup is not running.
 
-If you want to boot down your development box, type: 
+If you want to boot down your development box, run `spinup.py` again and type: 
 
     >> spindown
 
-You can boot up your dev box again by navigating into the project folder and running `spinup.py` again.
+You can boot up your dev box anytime by navigating into the project folder and running `spinup.py` again.
 
 The .devbox folder 
 ------------------
 
-When you run Spinup, it will create a hidden folder called `.devbox` in the current working directory. All special files are contained there. This is much like how git stores its special files in a hidden folder called `.git`. 
+When you spin up a develpmont box for the first time in a folder, Spinup will create a hidden folder called `.devbox` in the current working directory. All special files are contained there. This is much like how git stores its special files in a hidden folder called `.git`. 
 
 Spinup will then create a `Vagrantfile` inside the `.devbox` folder, and the `Vagrantfile` is the configuration file for vagrant. You can edit it as you see fit; Spinup will only modify forwarded ports if there are port conflicts that it needs to resolve.
 
