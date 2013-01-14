@@ -360,7 +360,8 @@ class Provisioner:
         filename = cwd + os.sep + 'index.html'
         index_file = Utilities.file_exists(filename)
 
-        # Construct a basic nginx virtual hosts file
+        # Construct a basic manifest that makes sure nginx
+        # is up and running and points to the cwd as its web root.
         nginx = '# Make sure Nginx is installed.\n'
         nginx += "package { 'nginx':\n"
         nginx += '    ensure => present,\n'
