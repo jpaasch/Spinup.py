@@ -750,7 +750,7 @@ class Spinner:
                 print message
                 self.data.port = new_port
                 self.shut_down_box()
-                self.spinup(self.data.box, port=new_port)
+                self.spinup(self.data.box)
             else:
                 message = """
                     I could not boot up the development box. 
