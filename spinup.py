@@ -260,7 +260,7 @@ class Installer:
         print "-- Attempting to install " + program + "..."
 
         # Run the `install` command
-        cmd = ['sudo', self.data.package_manager, 'install', program]
+        cmd = ['sudo', self.data.package_manager, '-y', 'install', program]
         try:
             result = subprocess.check_output(cmd)
         except subprocess.CalledProcessError:
