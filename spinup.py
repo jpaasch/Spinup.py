@@ -592,6 +592,11 @@ class Setup:
             contents +=    '"' + code_folder_path_on_host + '", '
             contents +=    ':create => true' + "\n" 
             contents += "\n"
+            contents += "  # Allow symlinks in the shared folder.\n"
+            contents += '  config.vm.customize ["setextradata", :id, '
+            contents +=    '"VBoxInternal2/SharedFoldersEnableSymlinksCreate/'
+            contents +=    code_folder_name + '", "1"]'
+            contents += "\n"
             contents += "  # Let Puppet do the provisioning.\n"
             contents += '  config.vm.provision :puppet, '
             contents +=    ':options => \'--verbose\'' + "\n"
