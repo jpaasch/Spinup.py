@@ -363,13 +363,13 @@ class Provisioner:
         # Construct a basic manifest that makes sure nginx
         # is up and running and points to the cwd as its web root.
         nginx = '# Make sure Nginx is installed.\n'
-        nginx = '#######################################\n'
+        nginx += '#######################################\n'
         nginx += "package { 'nginx':\n"
         nginx += '    ensure => present,\n'
         nginx += '}\n'
         nginx += '\n\n'
         nginx += '# Rewrite the virtual hosts file\n'
-        nginx = '#######################################\n'
+        nginx += '#######################################\n'
         nginx += "file { '/etc/nginx/sites-available/default':\n"
         nginx += "    require => Package['nginx'],\n"
         nginx += "    content => '\n"
@@ -384,7 +384,7 @@ class Provisioner:
         nginx += '\n\n'
         if not index_file:
             nginx += '# Create an index file\n'
-            nginx = '#######################################\n'
+            nginx += '#######################################\n'
             nginx += "file { '" + self.data.code_folder_path_on_box 
             nginx +=          "/index.html':\n"
             nginx += "    require => File["
@@ -395,7 +395,7 @@ class Provisioner:
             nginx += '}\n'
             nginx += '\n\n'
         nginx += '# Make sure nginx is running.\n'
-        nginx = '#######################################\n'
+        nginx += '#######################################\n'
         nginx += "service { 'nginx':\n"
         nginx += '    ensure => running,\n'
         nginx += "    require => File[" 
@@ -532,9 +532,21 @@ class Setup:
         """
 
         # Establish some useful values.
-        box = str(self.data.box)
-        box_url = str(self.data.box_url)
-        port = str(self.data.port)
+        if hasattr(self.data, 'new_box'):
+            box = str(self.data.new_box)
+        else:
+            str(self.data.box)
+
+        if hasattr(self.data, 'new_box_url'):
+            box_url = str(self.data.new_box_url)
+        else:
+            box_url = str(self.data.box_url)
+
+        if hasattr(self.data, 'new_port'):
+            port = str(self.data.new_port)
+        else:
+            port = str(self.data.port)
+
         code_folder_name = str(self.data.code_folder_name)
         code_folder_path_on_box = str(self.data.code_folder_path_on_box)
         code_folder_path_on_host = str(os.path.realpath(os.getcwd()))
@@ -600,6 +612,7 @@ class Setup:
             contents += '  config.vm.box = "' + box + '"' + "\n"
             contents += "\n\n"
             contents += "  # The url to download the box from.\n"
+            contents += "  #######################################\n"
             contents += '  config.vm.box_url = "' + box_url + '"' + "\n"
             contents += "\n\n"
             contents += "  # Bridge the box's network to your computer's.\n"
