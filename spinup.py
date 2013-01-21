@@ -570,6 +570,9 @@ class Setup:
                         self.data.port = self.data.new_port
                     else:
                         contents += line
+                        parts = line.split('config.vm.forward_port 80,')
+                        new_port = parts[1].strip()
+                        self.data.port = new_port
 
                 # Otherwise, leave the line as it is.
                 else:
@@ -707,7 +710,7 @@ class Spinner:
                 Utilities.show_error(message)
 
 
-    def shut_down_box(self, show_message=True):
+    def shut_down_box(self):
         """
         Shut down a development box with `vagrant halt`
         """
@@ -726,14 +729,13 @@ class Spinner:
             """
             Utilities.show_error(message) 
         else:
-            if show_message:
-                message =  "\n"
-                message += "\n"
-                message += "*********************************************\n\n"
-                message += "\n"
-                message += "   The dev box successfully shut down.\n"
-                message += "\n"
-                print message
+            message =  "\n"
+            message += "\n"
+            message += "*********************************************\n\n"
+            message += "\n"
+            message += "   The dev box successfully shut down.\n"
+            message += "\n"
+            print message
 
         # Get out of the vagrant folder
         self.cd_out_of_vagrant()
@@ -807,9 +809,6 @@ class Spinner:
 
         # Setup the box
         self.data.setup.setup_box()
-
-        # Shut down the box, if any is running.
-        self.shut_down_box(show_message=False)
 
         # Boot up the machine
         self.boot_up_box()
