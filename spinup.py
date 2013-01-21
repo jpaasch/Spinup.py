@@ -363,25 +363,28 @@ class Provisioner:
         # Construct a basic manifest that makes sure nginx
         # is up and running and points to the cwd as its web root.
         nginx = '# Make sure Nginx is installed.\n'
+        nginx = '#######################################\n'
         nginx += "package { 'nginx':\n"
         nginx += '    ensure => present,\n'
         nginx += '}\n'
-        nginx += '\n'
+        nginx += '\n\n'
         nginx += '# Rewrite the virtual hosts file\n'
+        nginx = '#######################################\n'
         nginx += "file { '/etc/nginx/sites-available/default':\n"
         nginx += "    require => Package['nginx'],\n"
         nginx += "    content => '\n"
         nginx += "server {\n"
         nginx += '    listen      80;\n'
         nginx += '    server_name localhost;\n'
-        nginx += '\n'
+        nginx += '\n\n'
         nginx += '    index       index.html;\n'
         nginx += '    root        ' + self.data.code_folder_path_on_box + ';\n'
         nginx += "}',\n"
         nginx += '}\n'
-        nginx += '\n'
+        nginx += '\n\n'
         if not index_file:
             nginx += '# Create an index file\n'
+            nginx = '#######################################\n'
             nginx += "file { '" + self.data.code_folder_path_on_box 
             nginx +=          "/index.html':\n"
             nginx += "    require => File["
@@ -390,8 +393,9 @@ class Provisioner:
             nginx += '<html><h1>Welcome to your nginx site.</h1></html>\n'
             nginx += "',\n"
             nginx += '}\n'
-            nginx += '\n'
+            nginx += '\n\n'
         nginx += '# Make sure nginx is running.\n'
+        nginx = '#######################################\n'
         nginx += "service { 'nginx':\n"
         nginx += '    ensure => running,\n'
         nginx += "    require => File[" 
@@ -553,6 +557,9 @@ class Setup:
                         contents += str(self.data.new_box) + '"\n'
                     else:
                         contents += line
+                        parts = line.split('=')
+                        current_box = parts[1].strip()
+                        self.data.current_box = current_box
 
                 # Modify the box url line if a new box url was specified
                 elif 'config.vm.box_url = ' in line:
@@ -561,8 +568,11 @@ class Setup:
                         contents += str(self.data.new_box_url) + '"\n'
                     else:
                         contents += line
+                        parts = line.split('=')
+                        current_box_url = parts[1].strip()
+                        self.data.box_url = current_box_url
 
-                # Modify the port line if a new port was specified
+                # Modify the port line if a new port was specified.
                 elif 'config.vm.forward_port 80,' in line:
                     if hasattr(self.data, 'new_port'):
                         contents += '  config.vm.forward_port 80, '
@@ -571,8 +581,8 @@ class Setup:
                     else:
                         contents += line
                         parts = line.split('config.vm.forward_port 80,')
-                        new_port = parts[1].strip()
-                        self.data.port = new_port
+                        current_port = parts[1].strip()
+                        self.data.port = current_port
 
                 # Otherwise, leave the line as it is.
                 else:
@@ -582,38 +592,44 @@ class Setup:
         else:
             contents += '# -*- mode: ruby -*-' + "\n"
             contents += '# vi: set ft=ruby :' + "\n"
-            contents += "\n"
+            contents += "\n\n"
             contents += 'Vagrant::Config.run do |config|' + "\n"
-            contents += "\n"
+            contents += "\n\n"
             contents += "  # The base box to build off of.\n"
+            contents += "  #######################################\n"
             contents += '  config.vm.box = "' + box + '"' + "\n"
-            contents += "\n"
+            contents += "\n\n"
             contents += "  # The url to download the box from.\n"
             contents += '  config.vm.box_url = "' + box_url + '"' + "\n"
-            contents += "\n"
+            contents += "\n\n"
             contents += "  # Bridge the box's network to your computer's.\n"
+            contents += "  #######################################\n"
             contents += '  config.vm.network :bridged' + "\n"
-            contents += "\n"
+            contents += "\n\n"
             contents += "  # Hook the box's ports up to your computer's.\n"
+            contents += "  #######################################\n"
             contents += '  config.vm.forward_port 80, ' 
             contents +=    port + "\n"
-            contents += "\n"
+            contents += "\n\n"
             contents += "  # Share a folder with the box.\n"
+            contents += "  #######################################\n"
             contents += '  config.vm.share_folder "' 
             contents +=    code_folder_name + '", '
             contents +=    '"' + code_folder_path_on_box + '", '
             contents +=    '"' + code_folder_path_on_host + '", '
             contents +=    ':create => true' + "\n" 
-            contents += "\n"
+            contents += "\n\n"
             contents += "  # Allow symlinks in the shared folder.\n"
+            contents += "  #######################################\n"
             contents += '  config.vm.customize ["setextradata", :id, '
             contents +=    '"VBoxInternal2/SharedFoldersEnableSymlinksCreate/'
             contents +=    code_folder_name + '", "1"]'
-            contents += "\n"
+            contents += "\n\n"
             contents += "  # Let Puppet do the provisioning.\n"
+            contents += "  #######################################\n"
             contents += '  config.vm.provision :puppet, '
             contents +=    ':options => \'--verbose\'' + "\n"
-            contents += "\n"
+            contents += "\n\n"
             contents += 'end' + "\n"
 
         # Write the file
@@ -733,7 +749,7 @@ class Spinner:
             message += "\n"
             message += "*********************************************\n\n"
             message += "\n"
-            message += "   The dev box successfully shut down.\n"
+            message += "   The dev box is shut down.\n"
             message += "\n"
             print message
 
@@ -833,13 +849,18 @@ class Spinner:
         try: 
             result = subprocess.check_call(['vagrant', 'ssh'])
         except subprocess.CalledProcessError as exception:
-            message = """
-                I could not ssh into the development box. 
-                You could try navigating into the 
-                `""" + self.data.vagrant_folder + """`
-                folder and running the `vagrant ssh` command.
-            """
-            Utilities.show_error(message)
+            if exception.returncode is 44:
+                print "******************************\n\n"
+                print "The dev box is not running."
+                print "Try `spinup` to boot it up first."
+            else:
+                message = """
+                    I could not ssh into the development box. 
+                    You could try navigating into the 
+                    `""" + self.data.vagrant_folder + """`
+                    folder and running the `vagrant ssh` command.
+                """
+                Utilities.show_error(message)
 
         # Get out of the vagrant folder
         self.cd_out_of_vagrant()
