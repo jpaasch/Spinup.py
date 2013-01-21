@@ -546,20 +546,30 @@ class Setup:
         if Utilities.file_exists(self.data.vagrant_file):
             for line in fileinput.input([self.data.vagrant_file]):
 
-                # Modify the box name to use the specified name
+                # Modify the box name line if a new name was specified
                 if 'config.vm.box = ' in line:
-                    contents += '  config.vm.box = "'
-                    contents += box + '"\n'
+                    if hasattr(self.data, 'new_box'):
+                        contents += '  config.vm.box = "'
+                        contents += str(self.data.new_box) + '"\n'
+                    else:
+                        contents += line
 
-                # Modify the box url to use the specified url
+                # Modify the box url line if a new box url was specified
                 elif 'config.vm.box_url = ' in line:
-                    contents += '  config.vm.box_url = "'
-                    contents += box_url + '"\n'
+                    if hasattr(self.data, 'new_box_url'):
+                        contents += '  config.vm.box_url = "'
+                        contents += str(self.data.new_box_url) + '"\n'
+                    else:
+                        contents += line
 
-                # Modify the port line to use the specified port
+                # Modify the port line if a new port was specified
                 elif 'config.vm.forward_port 80,' in line:
-                    contents += '  config.vm.forward_port 80, '
-                    contents += port + '\n'
+                    if hasattr(self.data, 'new_port'):
+                        contents += '  config.vm.forward_port 80, '
+                        contents += str(self.data.new_port) + '\n'
+                        self.data.port = self.data.new_port
+                    else:
+                        contents += line
 
                 # Otherwise, leave the line as it is.
                 else:
@@ -697,7 +707,7 @@ class Spinner:
                 Utilities.show_error(message)
 
 
-    def shut_down_box(self):
+    def shut_down_box(self, show_message=True):
         """
         Shut down a development box with `vagrant halt`
         """
@@ -716,13 +726,14 @@ class Spinner:
             """
             Utilities.show_error(message) 
         else:
-            message =  "\n"
-            message += "\n"
-            message += "*********************************************\n\n"
-            message += "\n"
-            message += "   The dev box successfully shut down.\n"
-            message += "\n"
-            print message
+            if show_message:
+                message =  "\n"
+                message += "\n"
+                message += "*********************************************\n\n"
+                message += "\n"
+                message += "   The dev box successfully shut down.\n"
+                message += "\n"
+                print message
 
         # Get out of the vagrant folder
         self.cd_out_of_vagrant()
@@ -741,16 +752,15 @@ class Spinner:
             result = subprocess.check_call(['vagrant', 'up'])
         except subprocess.CalledProcessError as exception:
             if exception.returncode is 26:
-                new_port = self.data.port + 1
+                self.data.new_port = self.data.port + 1
                 message = """
                     The port """ + str(self.data.port) + """
                     is already in use. Trying again with 
-                    port """ + str(new_port) + """.
+                    port """ + str(self.data.new_port) + """.
                 """
                 print message
-                self.data.port = new_port
                 self.shut_down_box()
-                self.spinup(self.data.box)
+                self.spinup()
             else:
                 message = """
                     I could not boot up the development box. 
@@ -785,18 +795,21 @@ class Spinner:
 
         # Store the box (if a box is specified)
         if 'box' in arguments:
-            self.data.box = arguments['box']
+            self.data.new_box = arguments['box']
 
         # Store the box url (if one is specified)
         if 'box-url' in arguments:
-            self.data.box_url = arguments['box-url']
+            self.data.new_box_url = arguments['box-url']
 
         # Store the port (if a port is specified)
         if 'port' in arguments:
-            self.data.port = arguments['port']
+            self.data.new_port = arguments['port']
 
         # Setup the box
         self.data.setup.setup_box()
+
+        # Shut down the box, if any is running.
+        self.shut_down_box(show_message=False)
 
         # Boot up the machine
         self.boot_up_box()
