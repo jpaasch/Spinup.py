@@ -535,7 +535,7 @@ class Setup:
         if hasattr(self.data, 'new_box'):
             box = str(self.data.new_box)
         else:
-            str(self.data.box)
+            box = str(self.data.box)
 
         if hasattr(self.data, 'new_box_url'):
             box_url = str(self.data.new_box_url)
