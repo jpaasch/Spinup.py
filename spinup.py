@@ -149,8 +149,8 @@ class Data:
     manifests_folder = vagrant_folder + os.sep + 'manifests'
     manifests_file = manifests_folder + os.sep + 'default.pp'
     port = 8500
-    box = 'lucid64'
-    box_url = 'http://files.vagrantup.com/lucid64.box'
+    box = 'precise64'
+    box_url = 'http://files.vagrantup.com/precise64.box'
     code_folder_name = 'root'
     code_folder_path_on_box = '/var/www/' + code_folder_name
 
