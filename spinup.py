@@ -190,7 +190,9 @@ class Installer:
         False otherwise.
         """
         try:
-            return subprocess.check_output(['which', program])
+            result = subprocess.check_call(['which', program])
+            if result is 0:
+                return True
         except subprocess.CalledProcessError:
             return False
 
