@@ -312,7 +312,7 @@ class Installer:
         # If this is linux...
         if self.data.os == 'linux':
 
-            # Only proceed if the requisite programs are not installed.
+            # Find out if the requisite programs are not installed.
             ready = True
             for program in self.required_software:
                 if not self.program_exists_on_nix(program):
@@ -330,6 +330,34 @@ class Installer:
             # The requisite programs are already installed.
             else:
                 return True 
+
+        # If this is some other kind of *nix style system...
+        else:
+
+            # Find out if the requisite programs are installed.
+            ready = True
+            for program in self.required_software:
+                if not self.program_exists_on_nix(program):
+                    ready = False
+
+            if not ready:
+
+                # Give a message about what's up                                
+                print "-------------------------------"
+                print "Before proceeding, you will need to install:"
+                print ""
+                print "- Virtualbox"
+                print "- Vagrant"
+                print "- Puppet"
+                print ""
+                print "Make sure all of these are installed,"
+                print "then run me again."
+                print ""
+                return False
+
+            # The requisite programs are already installed.                     
+            else:
+                return True
 
 
 
