@@ -190,11 +190,11 @@ class Installer:
         False otherwise.
         """
         try:
-            result = subprocess.check_call(['which', program])
-            if result is 0:
-                return True
+            result = subprocess.check_output(['which', program])
         except subprocess.CalledProcessError:
             return False
+        else:
+            return result.strip()
 
 
     def find_linux_package_manager(self):
@@ -207,7 +207,7 @@ class Installer:
         for program in self.linux_installers:
             package_manager = self.program_exists_on_nix(program)
             if package_manager is not False:
-                installer = package_manager.strip()
+                installer = package_manager
 
         # If no package manager was found, report an error. To report
         # an error in proper English, we need to format strings that
@@ -242,7 +242,9 @@ class Installer:
                 install the programs I need to spin up a
                 development environment. You could try 
                 installing the required software manually 
-                and then starting me up again.
+                and then starting me up again. You will
+                need to install (a) virtualbox, (b) vagrant,
+                and (c) puppet.
             """
             Utilities.show_error(message)
 
@@ -264,7 +266,7 @@ class Installer:
         # Run the `install` command
         cmd = ['sudo', self.data.package_manager, '-y', 'install', program]
         try:
-            result = subprocess.check_output(cmd)
+            result = subprocess.check_call(cmd)
         except subprocess.CalledProcessError:
             message = """
                 Unfortunately, I was not able to install """ + program + """.
