@@ -19,21 +19,23 @@ I hope to get it working on OS X at some point in the near future, and Windows t
 Installation
 ------------
 
-To install Spinup, simply download `spinup.py` and store it somewhere -- e.g. in `~/scripts/`. To use it, you can then type in a terminal:
+To install Spinup, simply download `spinup.py` somewhere -- e.g. in `~/Downloads/`, then install with:
 
-    > python ~/scripts/spinup.py
+    > sudo -u root install ~/Downloads/spinup.py /usr/local/bin/spinup
 
-If you like, you can create a shortcut in your `.bashrc` file, or whatever suits you.
+Then you can use it from anywhere, simply by typing on the command line:
+
+    > spinup
 
 Usage
 -----
 
-To use Spinup, navigate into the project folder you want a development server for, then run `spinup.py`. 
+To use Spinup, navigate into the project folder you want a development server for, then run `spinup`. 
 
-For instance, suppose I want to build a website in `~/Documents/my-new-website`. I would navigate into that folder, then run `spinup.py`, like this:
+For instance, suppose I want to build a website in `~/Documents/my-new-website`. I would navigate into that folder, then run `spinup`, like this:
 
     > cd ~/Documents/my-new-website
-    > python ~/scripts/spinup.py 
+    > spinup
 
 That will start up the interactive Spinup program, which will begin with a screen that looks something like this: 
 
@@ -90,11 +92,11 @@ If you then point your browser to `http://localhost:8500` (or whatever url Spinu
 
 You can exit the Spinup program and come back to it as many times as you like, but the VM will stay running in the background, even when Spinup is not running.
 
-If you want to boot down your development box, run `spinup.py` again and type: 
+If you want to boot down your development box, run `spinup` again and type: 
 
     >> spindown
 
-You can boot up your dev box anytime by navigating into the project folder and running `spinup.py` again.
+You can boot up your dev box anytime by navigating into the project folder and running `spinup` again.
 
 The .devbox folder 
 ------------------
