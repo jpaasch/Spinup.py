@@ -412,13 +412,14 @@ class Provisioner:
         nginx += '# Run an apt-get update\n'
         nginx += '#######################################\n'
         nginx += "exec { 'apt-get-update':\n"
-        nginx += "    command => 'sudo -u root apt-get update',\n"
+        nginx += "    command => 'apt-get update',\n"
         nginx += '}\n'
         nginx += '\n\n'
         nginx += '# Make sure Nginx is installed.\n'
         nginx += '#######################################\n'
         nginx += "package { 'nginx':\n"
         nginx += '    ensure => present,\n'
+        nginx += "    require => Exec['apt-get-update'],\n"
         nginx += '}\n'
         nginx += '\n\n'
         nginx += '# Rewrite the virtual hosts file\n'
