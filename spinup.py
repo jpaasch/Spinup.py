@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 """
 
 
@@ -394,7 +396,26 @@ class Provisioner:
 
         # Construct a basic manifest that makes sure nginx
         # is up and running and points to the cwd as its web root.
-        nginx = '# Make sure Nginx is installed.\n'
+        nginx  = '# Set the PATH\n'
+        nginx += '#######################################\n'
+        nginx += 'Exec {\n'
+        nginx += '    path => [\n'
+        nginx += '        "/usr/bin",\n'
+        nginx += '        "/usr/sbin",\n'
+        nginx += '        "/sbin",\n'
+        nginx += '        "/bin",\n'
+        nginx += '        "/usr/local/bin",\n'
+        nginx += '        "/usr/local/sbin"\n'
+        nginx += '    ],\n'
+        nginx += '}\n'
+        nginx += '\n\n'
+        nginx += '# Run an apt-get update\n'
+        nginx += '#######################################\n'
+        nginx += "exec { 'apt-get-update':\n"
+        nginx += "    command => 'sudo -u root apt-get update',\n"
+        nginx += '}\n'
+        nginx += '\n\n'
+        nginx += '# Make sure Nginx is installed.\n'
         nginx += '#######################################\n'
         nginx += "package { 'nginx':\n"
         nginx += '    ensure => present,\n'
