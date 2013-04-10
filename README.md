@@ -13,17 +13,18 @@ I have only tried Spinup on my own machine, so I cannot say that it will work on
 
 I hope to get it working on OS X at some point in the near future, and Windows too (eventually). At the moment, this is still just a prototype, meant mainly for easing my own development cycle.
 
-(The reason Spinup only works on Ubuntu OSes is because it relies on `apt-get` to install VirtualBox, Vagrant, and Puppet, if they're not already installed. In theory, Spinup should also work on the RedHat family of OSes, using `yum` instead of `apt-get`, but I haven't tried it. I wager it still needs some tweaking to work properly on those systems.)
+(The reason Spinup only works on Ubuntu OSes is because it relies on `apt-get` to install VirtualBox, Vagrant, and Puppet, if they're not already installed. In theory, it should also work on the RedHat family of OSes, since it will try to use `yum` instead of `apt-get` if it detects the operating system properly, but I haven't tried it. I wager it still needs some tweaking to work properly on those systems.)
 
 
 Installation
 ------------
 
-To install Spinup, 
+To install Spinup:
 
 * Download `spinup.py` somewhere -- e.g. in `~/Downloads/`.
 * Navigate into that directory.
-* Install with the following command.
+
+Now you can install it with the following command:
 
     > sudo -u root install spinup.py /usr/local/bin/spinup
 
