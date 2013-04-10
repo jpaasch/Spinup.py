@@ -19,11 +19,15 @@ I hope to get it working on OS X at some point in the near future, and Windows t
 Installation
 ------------
 
-To install Spinup, simply download `spinup.py` somewhere -- e.g. in `~/Downloads/`, then install with:
+To install Spinup, 
 
-    > sudo -u root install ~/Downloads/spinup.py /usr/local/bin/spinup
+* Download `spinup.py` somewhere -- e.g. in `~/Downloads/`.
+* Navigate into that directory.
+* Install with this command:
 
-Then you can use it from anywhere, simply by typing on the command line:
+    > sudo -u root install spinup.py /usr/local/bin/spinup
+
+Then you can use spinup from anywhere, simply by typing on the command line:
 
     > spinup
 
