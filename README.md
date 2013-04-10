@@ -23,7 +23,7 @@ To install Spinup,
 
 * Download `spinup.py` somewhere -- e.g. in `~/Downloads/`.
 * Navigate into that directory.
-* Install with this command:
+* Install with the following command.
 
     > sudo -u root install spinup.py /usr/local/bin/spinup
 
