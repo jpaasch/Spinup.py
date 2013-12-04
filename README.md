@@ -3,112 +3,82 @@ Spinup
 
 Spin up a development VM quickly and easily from the command line. 
 
+This is essentially a wrapper for virtualbox and vagrant, but it automates the setup a little and makes it possible to spin up a VM for a project with one or two commands. 
 
-This is essentially a wrapper for virtualbox, vagrant, and puppet, but it automates all the setup and makes it possible to spin up a VM for a project with one command.
+I really use this as a base for other projects that need customized VMs.
+
 
 Requirements
 ------------
 
-I have only tried Spinup on my own machine, so I cannot say that it will work on other machines. But it is currently meant to work on Ubuntu based Linux OSes.
-
-I hope to get it working on OS X at some point in the near future, and Windows too (eventually). At the moment, this is still just a prototype, meant mainly for easing my own development cycle.
-
-(The reason Spinup only works on Ubuntu OSes is because it relies on `apt-get` to install VirtualBox, Vagrant, and Puppet, if they're not already installed. In theory, it should also work on the RedHat family of OSes, since it will try to use `yum` instead of `apt-get` if it detects the operating system properly, but I haven't tried it. I wager it still needs some tweaking to work properly on those systems.)
+* Python
+* A linux/unixy system
+* Virtualbox
+* Vagrant 1.2+
 
 
 Installation
 ------------
 
-To install Spinup:
+To install `box`, download the repo and run the `install` script.
 
-* Download `spinup.py` somewhere -- e.g. in `~/Downloads/`.
-* Navigate into that directory.
+For instance, if you download and unzip the files in `~/Downloads/box`, you'd do this:
 
-Now you can install it with the following command:
+    $ cd ~/Downloads/box
+    $ ./install
 
-    > sudo -u root install spinup.py /usr/local/bin/spinup
+If it asks you for a password, supply it.
 
-Then you can use spinup from anywhere, simply by typing on the command line:
-
-    > spinup
-
-Usage
------
-
-To use Spinup, navigate into the project folder you want a development server for, then run `spinup`. 
-
-For instance, suppose I want to build a website in `~/Documents/my-new-website`. I would navigate into that folder, then run `spinup`, like this:
-
-    > cd ~/Documents/my-new-website
-    > spinup
-
-That will start up the interactive Spinup program, which will begin with a screen that looks something like this: 
-
-```
-
-*********************************************
-
-   Welcome to Spinup.
-   What would you like to do?
-
----------------------------------------------
-
--- `spinup` to spin up your dev box.
--- `exit` to quit
--- `spindown` to shut down your dev box.
--- `help <command>` for help on a specific command
--- `help` for a list of all commands
-
->> 
-
-```
-
-To spin up a development VM, type: 
-
-    >> spinup 
-
-(Note: the first time you do this, it will likely take a long time. This is because Spinup has to download a basic linux box (so be sure you have a good internet connection). After the first time though, it is much quicker.)
-
-When the development box starts booting up, you will see a lot of output getting spit out on the command line, but when all is said and done, Spinup will tell you that your development box is ready. The screen will look something like this: 
-
-```
-*********************************************
+Once the `install` script runs, the command `box` will be available on your system.
 
 
-   READY
-   -----------------------------------
+Creating a VM
+-------------
 
-   The dev box is ready for use.
-   You can reach your site at this address:
+To create a VM, make a folder to house your VM and navigate into it:
 
-   -- http://localhost:8500
+    $ mkdir ~/ubuntu-vm 
+    $ cd ~/ubuntu-vm
+
+Then run the `box init` command:
+
+    $ box init
+
+That's it. Now you can use the VM.
 
 
--- `spindown` to shut down your dev box.
--- `help` for a list of all commands
--- `exit` to quit
--- `ssh` to ssh into your dev box.
--- `help <command>` for help on a specific command
+Using the VM
+------------
 
->> 
-```
+Use `box up` to boot up the VM:
 
-If you then point your browser to `http://localhost:8500` (or whatever url Spinup gives you), you'll see a working web page. If you look in your current working directory, you'll see an `index.html` file. That's the file you see at `http://localhost:8500`. The VM's webserver (nginx) is now pointing at your current working directory, so you can build a website there.
+    $ box up
 
-You can exit the Spinup program and come back to it as many times as you like, but the VM will stay running in the background, even when Spinup is not running.
+Use `down` to shut it down:
 
-If you want to boot down your development box, run `spinup` again and type: 
+    $ box down
 
-    >> spindown
+And use `ssh` to SSH into it.
 
-You can boot up your dev box anytime by navigating into the project folder and running `spinup` again.
 
-The .devbox folder 
-------------------
+Provisioning the VM
+-------------------
 
-When you spin up a develpmont box for the first time from within a folder, Spinup will create a hidden folder called `.devbox` in that directory. All special files are contained there. This is much like how git stores its special files in a hidden folder called `.git`. 
+When you run `box init` in a folder, a hidden folder called `.devbox` is created there. The config files for your VM are stored there.
 
-Spinup will then create a `Vagrantfile` inside the `.devbox` folder, and the `Vagrantfile` is the configuration file for vagrant. You can edit it as you see fit; Spinup will only modify forwarded ports if there are port conflicts that it needs to resolve.
+If you look in `.devbox/config/bash`, you'll see a file called `provision`. That's just a bash script, and the VM runs it (as root) the first time the VM boots up.
 
-Spinup will also create in `.devbox` a `manifests` folder and a basic `default.pp` file. The `default.pp` manifest does little more than make sure nginx is up and running on your development box, and that it points to your current working directory. If you want to modify the manifest file, by all means do. Spinup will not overwrite your changes. 
+If you want to install anything special on your VM, you can put it in this file. If you've already booted the VM and want to reapply this script to the VM, run:
+
+    $ box provision
+
+Deleting the VM
+---------------
+
+If you want to delete the VM, use the `destroy` command:
+
+    $ box destroy
+
+The hidden `.devbox` folder is not deleted though. You need to delete it yoursel if you want it removed.
+
 
