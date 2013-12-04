@@ -1,0 +1,31 @@
+#!/bin/bash
+
+############################################################
+#
+#
+#
+#    BOX
+#    --------------------------------------------------
+#
+#    Copyright 2013 JT Paasch
+#    License MIT <http://opensource.org/licenses/MIT>
+#
+#
+############################################################
+
+
+# Print a message.
+echo "Installing..."
+echo "-- install box /usr/local/bin"
+sudo install box /usr/local/bin
+
+# Create a .box directory in the home folder,
+# If it doesn't exist already.
+if [ ! -d $HOME/.box ]; then
+    echo "-- copying config to $HOME/.box...";
+    mkdir $HOME/.box
+fi
+sudo cp -r config $HOME/.box/
+echo "-- done"
+
+exit 0

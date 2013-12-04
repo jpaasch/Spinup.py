@@ -1,0 +1,59 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+############################################################
+#
+#
+#
+#    BOX
+#    --------------------------------------------------
+#
+#    Copyright 2013 JT Paasch
+#    License MIT <http://opensource.org/licenses/MIT>
+#
+#
+############################################################
+
+
+# Vagrant >=v1.2 required.
+VAGRANTFILE_API_VERSION = '2'
+
+Vagrant.configure VAGRANTFILE_API_VERSION do |configure|
+
+  # The name of the base box.
+  configure.vm.box = 'precise64'
+
+  # The url to fetch the base box from, if it doesn't exist.
+  configure.vm.box_url = 'http://files.vagrantup.com/precise64.box'
+
+  # Use a private network.
+  configure.vm.network :private_network, ip: '10.20.30.40'
+
+  # Share a folder with the VM.
+  configure.vm.synced_folder '..', '/home/vagrant/code'
+
+  # Change some VirtualBox defaults.
+  configure.vm.provider :virtualbox do |virtualbox|
+
+    # Disable accelerated 3D graphics.
+    virtualbox.customize [
+      'modifyvm',
+      :id,
+      '--accelerate3d',
+      'off',
+    ]
+
+    # Add 512MB of memory to the VM.
+    virtualbox.customize [
+      'modifyvm',
+      :id,
+      '--memory',
+      '512',
+    ]
+  end
+
+  # Provision with a shell script.
+  configure.vm.provision "shell",
+    path: "config/bash/provision" 
+
+end

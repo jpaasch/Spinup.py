@@ -1,0 +1,373 @@
+#!/usr/bin/python
+
+############################################################
+#
+#
+#
+#    BOX
+#    --------------------------------------------------
+#
+#    Copyright 2013 JT Paasch
+#    License MIT <http://opensource.org/licenses/MIT>
+#
+#
+############################################################
+
+
+import os
+import argparse
+import subprocess
+import shutil
+
+
+class Settings:
+    """
+    A generic container for settings.
+
+    """
+
+    program = "box"
+    version = "0.1"
+    devbox_folder = ".devbox"
+    config_folder = devbox_folder + "/config"
+    source_config = os.path.expanduser("~") + "/.box/config"
+
+
+class Utilities:
+    """
+    A collection of utility methods.
+
+    """
+
+    @staticmethod
+    def log(message):
+        """
+        Prints a message to STDOUT.
+
+        """
+
+        # Trim the message.
+        result = message.strip()
+
+        # Print it to STDOUT.
+        print result
+
+
+    @staticmethod
+    def create_folder(folder):
+        """
+        Attempts to create a folder.
+        Returns True on success, False on failure.
+
+        """
+
+        try:
+            os.mkdir(folder, 0740)
+        except OSError:
+            return False
+        else:
+            return True
+
+
+    @staticmethod
+    def copy_folder(source, destination):
+        """
+        Attempts to copy a folder.
+        Returns True on success, False on failure.
+
+        """
+
+        try:
+            shutil.copytree(source, destination)
+        except (OSError, IOError):
+            return False
+        else:
+            return True
+
+
+    @staticmethod
+    def copy_file(source, destination):
+        """
+        Attempts to copy a folder.
+        Returns True on success, False on failure.
+
+        """
+
+        try:
+            shutil.copy(source, destination)
+        except (OSError, IOError):
+            return False
+        else:
+            return True
+
+
+
+class Installer:
+    """
+    Handles installation of the VM.
+
+    """
+
+    @staticmethod
+    def init():
+        """ 
+        Initialize the installer.
+
+        """
+
+        # Check that all required programs are installed.
+        Installer.check_requirements()
+
+        # Configure the devbox.
+        Installer.configure_devbox()
+
+        # Print a message.
+        message  = "Configured for use. "
+        message += "Use '" + Settings.program + " up' to boot the VM."
+        Utilities.log(message)
+
+
+    @staticmethod
+    def check_requirements():
+        """ 
+        Checks for required software on the user's system.
+
+        """
+
+        # Which programs are reqired?
+        required_programs = ['virtualbox', 'vagrant']
+
+        # Make sure the required programs are installed.
+        for program in required_programs:
+
+            # What's the path to the executable?
+            try:
+                subprocess.check_output(['which', program])
+            except subprocess.CalledProcessError:
+                message = "Please install " + program + " before proceeding."
+                Utilities.log(message)
+                exit(1)
+ 
+
+    @staticmethod
+    def configure_devbox():
+        """
+        Create a .devbox folder and copy config files into it.
+
+        """
+
+        # Does a devbox folder already exist?
+        is_present = os.path.isdir(Settings.devbox_folder)
+
+        # If so, alert the user and exit.
+        if is_present:
+            message1  = "This folder is already initialized."
+            message2  = "To re-initialize, "
+            message2 += "run '" + Settings.program + " destroy' first."
+            Utilities.log(message1)
+            Utilities.log(message2)
+            exit(1)
+
+        # Create the config folder in the current directory.
+        Utilities.create_folder(Settings.devbox_folder)
+
+        # Copy config files.
+        source_folder = Settings.source_config
+        dest_folder = Settings.config_folder
+        folder_copied = Utilities.copy_folder(source_folder, dest_folder)
+
+        # Report any errors.
+        if not folder_copied:
+            Utilities.log("Could not copy config files.")
+            exit(1)
+
+        # Copy the Vagrantfile to the root of the devbox folder.
+        source_file = Settings.config_folder + "/vagrant/Vagrantfile"
+        dest_location = Settings.devbox_folder
+        file_copied = Utilities.copy_file(source_file, dest_location)
+
+        # Report any errors.
+        if not file_copied:
+            Utilities.log("Could not copy Vagrantfile.")
+            exit(1)
+
+
+class Vagrant:
+    """
+    Handles vagrant commands.
+
+    """
+
+    @staticmethod
+    def stop_if_not_init():
+        """
+        Checks if the folder is initialized for vagrant.
+        Stops the program if not.
+
+        """
+
+        # Does a devbox folder exist?
+        is_present = os.path.isdir(Settings.devbox_folder)
+
+        # If not, alert the user and exit.
+        if not is_present:
+            message  = "This folder is not initialized. "
+            message += "Run '" + Settings.program + " init' first."
+            Utilities.log(message)
+            exit(1)
+
+
+    @staticmethod
+    def up():
+        """
+        Boots the VM up.
+
+        """
+
+        # Stop the program if no init has occurred.
+        Vagrant.stop_if_not_init()
+
+        # Run vagrant up from the vagrant folder.
+        command = ["vagrant", "up"]
+        try:
+            result = subprocess.check_call(command, cwd=Settings.devbox_folder)
+        except subprocess.CalledProcessError:
+            Utilities.log("Could not run 'vagrant up'.")
+            exit(1)
+        
+
+    @staticmethod
+    def down():
+        """
+        Boots the VM down.
+
+        """
+
+        # Stop the program if no init has occurred.
+        Vagrant.stop_if_not_init()
+
+        # Run vagrant halt from the vagrant folder.
+        command = ["vagrant", "halt"]
+        try:
+            result = subprocess.check_call(command, cwd=Settings.devbox_folder)
+        except subprocess.CalledProcessError:
+            Utilities.log("Could not run 'vagrant halt'.")
+            exit(1)
+
+
+    @staticmethod
+    def destroy():
+        """
+        Destroys the VM altogether.
+
+        """
+
+        # Stop the program if no init has occurred.
+        Vagrant.stop_if_not_init()
+
+        # Run vagrant destroy from the vagrant folder.
+        command = ["vagrant", "destroy"]
+        try:
+            result = subprocess.check_call(command, cwd=Settings.devbox_folder)
+        except subprocess.CalledProcessError:
+            Utilities.log("Could not run 'vagrant destroy'.")
+            exit(1)
+
+
+    @staticmethod
+    def provision():
+        """
+        Re-provision the VM.
+
+        """
+
+        # Stop the program if no init has occurred.
+        Vagrant.stop_if_not_init()
+
+        # Run vagrant provision from the vagrant folder.
+        command = ["vagrant", "provision"]
+        try:
+            result = subprocess.check_call(command, cwd=Settings.devbox_folder)
+        except subprocess.CalledProcessError:
+            Utilities.log("Could not run 'vagrant provision'.")
+            exit(1)
+
+
+    @staticmethod
+    def ssh():
+        """
+        SSH into the VM.
+
+        """
+
+        # Stop the program if no init has occurred.
+        Vagrant.stop_if_not_init()
+
+        # Run vagrant ssh from the vagrant folder.
+        command = ["vagrant", "ssh"]
+        try:
+            result = subprocess.check_call(command, cwd=Settings.devbox_folder)
+        except subprocess.CalledProcessError:
+            Utilities.log("Could not run 'vagrant ssh'.")
+            exit(1)
+
+
+def main():
+    """
+    The main entry point into the program.
+
+    """
+
+    # Get a parser to parse command line arguments.
+    parser = argparse.ArgumentParser(version="%(prog)s " + Settings.version)
+
+    # Add a first positional argument.
+    parser.add_argument("init", help="Initialize a VM.", nargs="?")
+
+    # Add some further posiional arguments,
+    # just so they appear in the usage/help screen.
+    parser.add_argument("up", help="Boot up the VM.", nargs="?")
+    parser.add_argument("down", help="Shut down the VM.", nargs="?")
+    parser.add_argument("ssh", help="SSH into the VM.", nargs="?")
+    parser.add_argument("provision", help="Re-provision the VM.", nargs="?")
+    parser.add_argument("destroy", help="Destroy the VM.", nargs="?")
+
+    # Now parse the arguments.
+    arguments = parser.parse_args()
+
+    # Was the command "init"? 
+    if arguments.init == 'init':
+        Installer.init()
+
+    # Was the command "up"?
+    elif arguments.init == 'up':
+        Vagrant.up()
+
+    # Was the command "down"?
+    elif arguments.init == "down":
+        Vagrant.down()
+
+    # Was the command "ssh"?
+    elif arguments.init == "ssh":
+        Vagrant.ssh()
+
+    # Was the command "provision"?
+    elif arguments.init == "provision":
+        Vagrant.provision()
+
+    # Was the command "destroy"?
+    elif arguments.init == "destroy":
+        Vagrant.destroy()
+
+    else:
+        parser.print_help()
+
+    # Exit cleanly.
+    exit(0)
+
+
+# Run the main() function if this is executed as a program.
+if __name__ == "__main__":
+    main()
+
+

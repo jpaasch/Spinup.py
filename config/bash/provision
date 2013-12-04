@@ -1,0 +1,29 @@
+#!/bin/bash
+
+############################################################
+#
+#
+#
+#    BOX
+#    --------------------------------------------------
+#
+#    Copyright 2013 JT Paasch
+#    License MIT <http://opensource.org/licenses/MIT>
+#
+#
+############################################################
+
+# Update apt-get.
+sudo apt-get update
+
+# Install vim, emacs, and git.
+sudo apt-get install -y vim
+sudo apt-get install -y emacs23-nox
+sudo apt-get install -y git
+
+
+# Leave a message.
+echo "Finished provisioning."
+
+# Exit cleanly.
+exit 0
