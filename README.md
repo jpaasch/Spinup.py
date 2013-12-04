@@ -1,11 +1,11 @@
-Spinup
-======
+BOX
+===
 
 Spin up a development VM quickly and easily from the command line. 
 
 This is essentially a wrapper for virtualbox and vagrant, but it automates the setup a little and makes it possible to spin up a VM for a project with one or two commands. 
 
-I really use this as a base for other projects that need customized VMs.
+I really use this as a base for other projects that need customized VMs. It's just a python script, so it can be quickly modified and installed on virtually any unixy system.
 
 
 Requirements
