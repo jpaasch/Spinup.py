@@ -27,7 +27,7 @@ For instance, if you download and unzip the files in `~/Downloads/box`, you'd do
     $ cd ~/Downloads/box
     $ ./install
 
-If it asks you for a password, supply it.
+If it asks for a password, supply it.
 
 Once the `install` script runs, the command `box` will be available on your system.
 
@@ -35,7 +35,7 @@ Once the `install` script runs, the command `box` will be available on your syst
 Creating a VM
 -------------
 
-To create a VM, make a folder to house your VM and navigate into it:
+To create a VM, make a folder to house your VM and navigate into it. For instance:
 
     $ mkdir ~/ubuntu-vm 
     $ cd ~/ubuntu-vm
@@ -44,7 +44,7 @@ Then run the `box init` command:
 
     $ box init
 
-That's it. Now you can use the VM.
+That's it. The VM is ready for use.
 
 
 Using the VM
@@ -60,15 +60,17 @@ Use `down` to shut it down:
 
 And use `ssh` to SSH into it.
 
+    $ box ssh
+
 
 Provisioning the VM
 -------------------
 
-When you run `box init` in a folder, a hidden folder called `.devbox` is created there. The config files for your VM are stored there.
+When you run `box init`, it creates a folder called `.devbox` in the current directory. The config files for the VM are stored there.
 
 If you look in `.devbox/config/bash`, you'll see a file called `provision`. That's just a bash script, and the VM runs it (as root) the first time the VM boots up.
 
-If you want to install anything special on your VM, you can put it in this file. If you've already booted the VM and want to reapply this script to the VM, run:
+If you want to install anything special on your VM, you can put it in this file. If you've already booted the VM and want to re-apply this script to the VM, run:
 
     $ box provision
 

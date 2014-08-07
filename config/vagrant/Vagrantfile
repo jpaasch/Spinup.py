@@ -36,20 +36,17 @@ Vagrant.configure VAGRANTFILE_API_VERSION do |configure|
   configure.vm.provider :virtualbox do |virtualbox|
 
     # Disable accelerated 3D graphics.
-    virtualbox.customize [
-      'modifyvm',
-      :id,
-      '--accelerate3d',
-      'off',
-    ]
+    virtualbox.customize ['modifyvm', :id, '--accelerate3d', 'off']
 
     # Add 512MB of memory to the VM.
-    virtualbox.customize [
-      'modifyvm',
-      :id,
-      '--memory',
-      '512',
-    ]
+    virtualbox.customize ['modifyvm', :id, '--memory', '512']
+
+    # Use the host's DNS resolver (not the VM's).
+    virtualbox.customize ['modifyvm', :id, '--natdnshostresolver1', 'on']
+
+    # Use the host's DNS proxy too.
+    virtualbox.customize ['modifyvm', :id, '--natdnsproxy1', 'on']
+
   end
 
   # Provision with a shell script.

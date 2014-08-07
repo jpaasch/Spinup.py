@@ -163,7 +163,8 @@ class Installer:
         if is_present:
             message1  = "This folder is already initialized."
             message2  = "To re-initialize, "
-            message2 += "run '" + Settings.program + " destroy' first."
+            message2 += "run '" + Settings.program + " destroy' "
+            message2 += "and delete .devbox first."
             Utilities.log(message1)
             Utilities.log(message2)
             exit(1)
