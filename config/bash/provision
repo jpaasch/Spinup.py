@@ -7,7 +7,7 @@
 #    BOX
 #    --------------------------------------------------
 #
-#    Copyright 2013 JT Paasch
+#    Copyright 2015 JT Paasch
 #    License MIT <http://opensource.org/licenses/MIT>
 #
 #
@@ -18,7 +18,7 @@ sudo apt-get update
 
 # Install vim, emacs, and git.
 sudo apt-get install -y vim
-sudo apt-get install -y emacs23-nox
+sudo apt-get install -y emacs24-nox
 sudo apt-get install -y git
 
 
