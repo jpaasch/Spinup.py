@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 ############################################################
 #
@@ -20,12 +20,15 @@ sudo apt-get update
 sudo apt-get install -y vim
 sudo apt-get install -y emacs24-nox
 sudo apt-get install -y git
+sudo apt-get install -y wget
+sudo apt-get install -y curl
 
-# Run all other files in this directory.
-THIS_FILE=`basename "$0"`
-for FILE in * ; do
-    if [ $FILE != $THIS_FILE ]; then
-        source ./$FILE
+# Execute any other scripts in this directory.
+PROVISION_SCRIPTS=/vagrant/config/bash/*
+THIS_SCRIPT=/vagrant/config/bash/provision
+for SCRIPT in $PROVISION_SCRIPTS ; do
+    if [ $SCRIPT != $THIS_SCRIPT ]; then
+        source $SCRIPT
     fi
 done
 
