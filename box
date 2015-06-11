@@ -33,7 +33,7 @@ class Settings:
     version = "0.1"
     devbox_folder = ".box"
     config_folder = devbox_folder + "/config"
-    source_config = os.path.expanduser("~") + "/.box/config"
+    source_config = os.path.expanduser("~") + "/.box.d/config"
 
 
 class Utilities:
@@ -118,6 +118,7 @@ class Installer:
 
         """
 
+        '''
         # Check that all required programs are installed.
         Installer.check_requirements()
 
@@ -128,6 +129,76 @@ class Installer:
         message  = "Configured for use. "
         message += "Use '" + Settings.program + " up' to boot the VM."
         Utilities.log(message)
+        '''
+
+        # Make sure this folder isn't already initialized.
+        # Does a devbox folder exist?
+        devbox = Installer.find_devbox()
+
+        # If there is a devbox, alert the user and exit.
+        if devbox:
+            message1  = "This folder is already initialized."
+            message2  = "To re-initialize, "
+            message2 += "run '" + Settings.program + " destroy' first."
+            Utilities.log(message1)
+            Utilities.log(message2)
+            exit(1)
+        # Check that all required programs are installed.
+        Installer.check_requirements()
+
+        # Configure the devbox.
+        Installer.configure_devbox()
+
+        # Print a message.
+        message  = "Configured for use. "
+        message += "Use '" + Settings.program + " up' to boot the VM."
+        Utilities.log(message)
+
+
+    @staticmethod
+    def find_devbox(path = None):
+        """
+        This method recursively walks the directory tree up,
+        until it finds the devbox folder. If one is found,
+        it returns the path. If none is found, it returns None.
+
+        """
+
+        # If no path is specified, use the current working directory.
+        if path is None:
+            path = os.getcwd()
+
+        # What would the full path of the devbox folder be,
+        # if it existed here?
+        if path == '/':
+            devbox = path + Settings.devbox_folder
+        else:
+            devbox = path + os.sep + Settings.devbox_folder
+
+        # Does it exist here?
+        if os.path.isdir(devbox):
+            return devbox
+        else:
+
+            # What's the parent folder?
+            # Note: if we're at the root, this will return the root.
+            parent_folder = os.path.dirname(path)
+
+            # If we're at the root, we don't need to proceed.
+            # We haven't found the devbox folder, and we can't
+            # go up any further in the directory tree.
+            if path == parent_folder:
+                return None
+
+            # Is the parent folder a real directory? If so, call this 
+            # function on it again to look for the devbox folder there.
+            if os.path.isdir(parent_folder):
+                return Installer.find_devbox(parent_folder)
+
+            # If there is no parent folder, we're at the root of 
+            # the directory tree, so we haven't found a devbox folder.
+            else:
+                return None
 
 
     @staticmethod
@@ -210,6 +281,7 @@ class Vagrant:
 
         """
 
+        '''
         # Does a devbox folder exist?
         is_present = os.path.isdir(Settings.devbox_folder)
 
@@ -219,6 +291,21 @@ class Vagrant:
             message += "Run '" + Settings.program + " init' first."
             Utilities.log(message)
             exit(1)
+        '''
+
+        # Does a devbox folder exist?
+        devbox = Installer.find_devbox()
+
+        # If not, alert the user and exit.
+        if devbox is None:
+            message  = "This folder is not initialized. "
+            message += "Run '" + Settings.program + " init' first."
+            Utilities.log(message)
+            exit(1)
+
+        # Otherwise, save the devbox folder.
+        else: 
+            Settings.devbox_folder = devbox
 
     @staticmethod
     def modify_private_ip(private_ip=None):
@@ -256,8 +343,10 @@ class Vagrant:
 
         # Run vagrant up from the vagrant folder.
         command = ["vagrant", "up"]
+        cwd = Settings.devbox_folder
+
         try:
-            result = subprocess.check_call(command, cwd=Settings.devbox_folder)
+            result = subprocess.check_call(command, cwd=cwd)
         except subprocess.CalledProcessError:
             Utilities.log("Could not run 'vagrant up'.")
             exit(1)

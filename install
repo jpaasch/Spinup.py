@@ -20,15 +20,15 @@ echo "-- install box /usr/local/bin"
 sudo install box /usr/local/bin
 
 # Delete the config folder in the home directory if it exists.
-if [ -d $HOME/.box ]; then
-    echo "-- deleting config from $HOME/.box...";
-    rm -rf $HOME/.box
+if [ -d $HOME/.box.d ]; then
+    echo "-- deleting config from $HOME/.box.d...";
+    rm -rf $HOME/.box.d
 fi
 
 # Now create a new config folder and copy the config to it.
-echo "-- copying config to $HOME/.box...";
-mkdir $HOME/.box
-cp -r config $HOME/.box/
+echo "-- copying config to $HOME/.box.d...";
+mkdir $HOME/.box.d
+cp -r config $HOME/.box.d/
 
 # We're done.
 echo "-- done"
