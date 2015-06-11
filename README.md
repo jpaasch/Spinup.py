@@ -11,10 +11,10 @@ I really use this as a base for other projects that need customized VMs. It's ju
 Requirements
 ------------
 
-* Python
 * A linux/unixy system
-* Virtualbox
-* Vagrant 1.2+
+* Python 2.7+
+* Virtualbox 4.3+
+* Vagrant 1.7+
 
 
 Installation
@@ -66,11 +66,13 @@ And use `ssh` to SSH into it.
 Provisioning the VM
 -------------------
 
-When you run `box init`, it creates a folder called `.devbox` in the current directory. The config files for the VM are stored there.
+When you run `box init`, it creates a folder called `.box` in the current directory. The config files for the VM are stored there.
 
-If you look in `.devbox/config/bash`, you'll see a file called `provision`. That's just a bash script, and the VM runs it (as root) the first time the VM boots up.
+If you look in `.box/config/bash`, you'll see a file called `provision`. That's just a bash script, and the VM runs it (as root) the first time the VM boots up.
 
-If you want to install anything special on your VM, you can put it in this file. If you've already booted the VM and want to re-apply this script to the VM, run:
+If you want to install anything special on your VM, write a bash script and put it in that folder (`.box/config/bash`). The `box` program will run all bash scripts it finds in this folder when it first boots up the VM.
+
+If you've already booted the VM for the first time, and you want to re-run the scripts on the VM, use this command:
 
     $ box provision
 
@@ -81,6 +83,6 @@ If you want to delete the VM, use the `destroy` command:
 
     $ box destroy
 
-The hidden `.devbox` folder is not deleted though. You need to delete it yoursel if you want it removed.
+The hidden `.box` folder is not deleted though. You need to delete it yoursel if you want it removed.
 
 
