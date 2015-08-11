@@ -83,6 +83,6 @@ If you want to delete the VM, use the `destroy` command:
 
     $ box destroy
 
-The hidden `.box` folder is not deleted though. You need to delete it yoursel if you want it removed.
+The hidden `.box` folder is not deleted though. You need to delete it yourself if you want it removed.
 
 
